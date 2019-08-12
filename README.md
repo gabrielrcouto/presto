@@ -1,3 +1,9 @@
+# This is a modified version of Presto JDBC
+
+I applied the [patch from vloup](https://groups.google.com/forum/#!topic/presto-users/koT1Yv3sKG4) to use with Zeppelin.
+
+Download the JAR on [releases page](https://github.com/gabrielrcouto/presto/releases).
+
 # Presto [![Build Status](https://travis-ci.org/prestodb/presto.svg?branch=master)](https://travis-ci.org/prestodb/presto)
 
 Presto is a distributed SQL query engine for big data.
