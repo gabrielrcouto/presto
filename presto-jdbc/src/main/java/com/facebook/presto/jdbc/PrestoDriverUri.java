@@ -92,9 +92,9 @@ final class PrestoDriverUri
     {
         this.uri = requireNonNull(uri, "uri is null");
         address = HostAndPort.fromParts(uri.getHost(), uri.getPort());
-        properties = mergeConnectionProperties(uri, driverProperties);
+        Properties unvalidatedProperties = mergeConnectionProperties(uri, driverProperties);
 
-        validateConnectionProperties(properties);
+        properties = validateConnectionProperties(unvalidatedProperties);
 
         // enable SSL by default for standard port
         useSecureConnection = SSL.getValue(properties).orElse(uri.getPort() == 443);
@@ -316,17 +316,21 @@ final class PrestoDriverUri
         }
     }
 
-    private static void validateConnectionProperties(Properties connectionProperties)
+    private static Properties validateConnectionProperties(Properties connectionProperties)
             throws SQLException
     {
+        Properties validatedProperties = new Properties();
+
         for (String propertyName : connectionProperties.stringPropertyNames()) {
-            if (ConnectionProperties.forKey(propertyName) == null) {
-                throw new SQLException(format("Unrecognized connection property '%s'", propertyName));
+            if (ConnectionProperties.forKey(propertyName) != null) {
+                validatedProperties.put(propertyName, connectionProperties.getProperty(propertyName));
             }
         }
 
         for (ConnectionProperty<?> property : ConnectionProperties.allProperties()) {
-            property.validate(connectionProperties);
+            property.validate(validatedProperties);
         }
+
+        return validatedProperties;
     }
 }
